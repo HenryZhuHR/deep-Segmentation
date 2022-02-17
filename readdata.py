@@ -16,7 +16,7 @@ def read_voc(root, max_num=None):
     labels = []
     pbar = tqdm.tqdm(file_name_list)
     for file_name in pbar:
-        # 读入数据并且转为RGB的 PIL image\
+        # 读入数据并且转为RGB的 PIL image
         images.append(
             Image.open('%s/JPEGImages/%s.jpg' %
                        (root, file_name)).convert("RGB")
