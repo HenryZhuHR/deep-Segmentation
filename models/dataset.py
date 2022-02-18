@@ -2,6 +2,8 @@ import os
 import tqdm
 from PIL import Image
 
+from torch.utils import data
+
 
 def read_voc(root, max_num=None):
 
@@ -29,4 +31,22 @@ def read_voc(root, max_num=None):
     return images, labels  # PIL image 0-255
 
 
-read_voc(root='%s/datasets/VOC2012' % ('E:'))
+# read_voc(root='%s/datasets/VOC2012' % ('E:'))
+
+
+class VOCSeg(data.Dataset):
+    """
+        - `root` : `<parent_path>/VOC2012`
+    """
+
+    def __init__(
+        self,
+        root: str='~/datasets/VOC2012',
+        # set,
+        # transform
+    ) -> None:
+        super().__init__()
+
+
+if __name__ == '__main__':
+    dataset = VOCSeg(root='%s/datasets/VOC2012' % ('E:'))
