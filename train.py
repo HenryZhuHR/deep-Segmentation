@@ -54,4 +54,4 @@ if __name__ == '__main__':
     from seg.fcn import FCN_8s
     model=models.segmentation.fcn_resnet50(pretrained=True,num_classes=21)
     # model=FCN_8s(n_class=21)
-    # model.to(DEVICE)
+    model.to(DEVICE)
