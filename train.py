@@ -2,11 +2,13 @@
 import os
 import time
 import tqdm
+
 import torch
 from torch import nn
 from torch import Tensor
 from torch import optim
 from torch.utils import data
+import pandas as pd
 import utils
 from utils.args import ARGSer
 
@@ -23,8 +25,10 @@ def print_train_info(ARGS: ARGSer):
 
 def main():
     ARGS = ARGSer()
-    LOG_FILE='%s/%s.txt'%(ARGS.SAVE_DIR,ARGS.SAVE_NAME)
-    open(LOG_FILE,'w').close()
+
+    CSV_FILE='%s/%s.csv'%(ARGS.SAVE_DIR,ARGS.SAVE_NAME)
+    os.makedirs(ARGS.SAVE_DIR, exist_ok=True)
+    open(CSV_FILE,'w').close()
 
     train_set, valid_set = get_dataset(ARGS)
     train_loader = data.DataLoader(train_set,  batch_size=ARGS.TRAIN_BATCH_SIZE,
@@ -66,9 +70,10 @@ def main():
         criterion = nn.CrossEntropyLoss(ignore_index=255, reduction='mean')
     criterion.to(ARGS.DEVICE)
 
-    os.makedirs(ARGS.SAVE_DIR, exist_ok=True)
+    
 
     # ==========   Train Loop   ==========#
+    train_frame = None
     for epoch in range(ARGS.EPOCHS):
         print('\033[32m', end='')
         print('[Epoch]%d/%d' % (epoch, ARGS.EPOCHS), end=' ')
@@ -86,14 +91,12 @@ def main():
         epoch_loss = 0.
         pbar = tqdm.tqdm(train_loader)
         for images, labels in pbar:
-            images: Tensor = images.to(ARGS.DEVICE)
-            labels: Tensor = labels.to(ARGS.DEVICE)
-            labels=labels.long()
-            # torch.set_printoptions(profile="full")
-            # print(labels)
+            images: Tensor = images.to(ARGS.DEVICE, dtype=torch.float32)
+            labels: Tensor = labels.to(ARGS.DEVICE, dtype=torch.long)
+
             epoch_num += images.size(0)
             optimizer.zero_grad()
-            outputs = model.forward(images)
+            outputs:Tensor = model(images)
             loss = criterion.forward(outputs, labels)
             loss.backward()
             optimizer.step()
@@ -109,24 +112,54 @@ def main():
         epoch_num = 0
         epoch_loss = 0.
         pbar = tqdm.tqdm(train_loader)
+        metrics.reset()
         for images, labels in pbar:
             images: Tensor = images.to(ARGS.DEVICE)
             labels: Tensor = labels.to(ARGS.DEVICE)
             labels=labels.long()
             epoch_num += images.size(0)
             with torch.no_grad():
-                outputs = model.forward(images)
+                outputs:Tensor = model(images)
                 loss = criterion.forward(outputs, labels)
+            preds = outputs.detach().max(dim=1)[1].cpu().numpy()
+            targets = labels.cpu().numpy()
+
+            metrics.update(targets, preds)
+
             batch_loss = loss.detach().cpu().numpy()
             epoch_loss += batch_loss
             epoch_info = 'Valid Loss:%.4f' % batch_loss
             pbar.set_description(epoch_info)
+        """
+            "Overall Acc": acc,
+            "Mean Acc": acc_cls,
+            "FreqW Acc": fwavacc,
+            "Mean IoU": mean_iu,
+            "Class IoU": cls_iu,    
+        """
+        score = metrics.get_results()
         valid_loss=epoch_loss/epoch_num
 
-        with open(LOG_FILE,'a') as f:
-            f.write('epoch:%d train_loss:%.6f valid_loss:%.6f'%(epoch,train_loss,valid_loss))
+        results={
+            'epoch':epoch,
+            'train_loss':train_loss,
+            'valid_loss':valid_loss,
+        }
+        for key,value in score.items():
+            if key =='Class IoU':continue
+            results[key]=value
 
-        save_model ='%s/%s-epoch.pt'%(ARGS.SAVE_DIR, ARGS.SAVE_NAME)
+        log_frame = pd.DataFrame(results, index=[epoch])
+        print(log_frame)
+
+        if train_frame is None:
+            train_frame = log_frame
+        else:
+            train_frame = pd.concat(
+                [train_frame, log_frame], ignore_index=True)
+        train_frame.to_csv(CSV_FILE, index=False, header=True)
+
+        save_model ='%s/%s-%d.pt'%(ARGS.SAVE_DIR, ARGS.SAVE_NAME,epoch)
         torch.save(model.state_dict(),save_model)
 
 
