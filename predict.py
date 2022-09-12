@@ -1,6 +1,6 @@
 from torch.utils.data import dataset
 from tqdm import tqdm
-import network
+import models
 import utils
 import os
 import random
@@ -30,9 +30,9 @@ def get_argparser():
                         choices=['voc', 'cityscapes'], help='Name of training set')
 
     # Deeplab Options
-    available_models = sorted(name for name in network.modeling.__dict__ if name.islower() and \
+    available_models = sorted(name for name in models.modeling.__dict__ if name.islower() and \
                               not (name.startswith("__") or name.startswith('_')) and callable(
-                              network.modeling.__dict__[name])
+                              models.modeling.__dict__[name])
                               )
 
     parser.add_argument("--model", type=str, default='deeplabv3plus_mobilenet',
@@ -82,9 +82,9 @@ def main():
         image_files.append(opts.input)
     
     # Set up model (all models are 'constructed at network.modeling)
-    model = network.modeling.__dict__[opts.model](num_classes=opts.num_classes, output_stride=opts.output_stride)
+    model = models.modeling.__dict__[opts.model](num_classes=opts.num_classes, output_stride=opts.output_stride)
     if opts.separable_conv and 'plus' in opts.model:
-        network.convert_to_separable_conv(model.classifier)
+        models.convert_to_separable_conv(model.classifier)
     utils.set_bn_momentum(model.backbone, momentum=0.01)
     
     if opts.ckpt is not None and os.path.isfile(opts.ckpt):
