@@ -23,3 +23,4 @@ if __name__ == '__main__':
 
     print('image tensor',train_set[0][0])
     print('label tensor',train_set[0][1])
+    print("lll")
