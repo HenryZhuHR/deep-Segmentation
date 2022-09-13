@@ -37,6 +37,11 @@ class ARGSer:
         self.SAVE_DIR: str = args.save_dir
         self.SAVE_NAME: str = args.save_name
 
+        # ====== Train ======
+        self.MODEL_WEIGHT: str = args.model_weight
+        self.IMAGE_FILE: str = args.image_file
+
+
     def init_args(self):
         parser = argparse.ArgumentParser()
         # ====== Dataset ======
@@ -67,6 +72,10 @@ class ARGSer:
         parser.add_argument('--save_dir', type=str, default='checkpoints')
         parser.add_argument('--save_name', type=str,
                             default='deeplabv3plus_resnet50')
+
+        # ====== Infer ======
+        parser.add_argument('--model_weight', type=str)
+        parser.add_argument('--image_file', type=str)
 
         args = parser.parse_args()
 

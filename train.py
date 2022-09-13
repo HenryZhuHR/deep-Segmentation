@@ -40,10 +40,10 @@ def main():
 
     model = get_model(ARGS.MODEL, num_classes=ARGS.NUM_CLASSES,
                       pretrained_backbone=True)
-    model.to(ARGS.DEVICE)
     if ARGS.SEPARABLE_CONV and ('plus' in ARGS.MODEL):
         convert_to_separable_conv(model.classifier)
     utils.set_bn_momentum(model.backbone, momentum=0.01)
+    model.to(ARGS.DEVICE)
 
     # Set up metrics
     metrics = StreamSegMetrics(ARGS.NUM_CLASSES)
