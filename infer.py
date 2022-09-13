@@ -79,9 +79,9 @@ def main():
     result=cv2.addWeighted(img_src,0.5,mask_np,0.5,0)
     print(img_src.shape)
     print(mask_np.shape)
-    cv2.imwrite('img-src.png',img_src)
-    cv2.imwrite('img-mask.png',mask_np)
-    cv2.imwrite('img-result.png',result)
+    cv2.imwrite('tmp/img-src.png',img_src)
+    cv2.imwrite('tmp/img-mask.png',mask_np)
+    cv2.imwrite('tmp/img-mask.png',result)
 
 
 if __name__ == '__main__':
