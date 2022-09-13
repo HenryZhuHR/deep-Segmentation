@@ -1,5 +1,5 @@
 import torch
-import torch.nn as nn
+from torch import nn,Tensor
 import numpy as np
 import torch.nn.functional as F
 from collections import OrderedDict
@@ -10,7 +10,7 @@ class _SimpleSegmentationModel(nn.Module):
         self.backbone = backbone
         self.classifier = classifier
         
-    def forward(self, x):
+    def forward(self, x:Tensor):
         input_shape = x.shape[-2:]
         features = self.backbone(x)
         x = self.classifier(features)
