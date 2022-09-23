@@ -12,7 +12,7 @@ for i in range(iter):
 
 list_of.reverse()
 current=center
-for i in range(iter):
+for i in range(iter):  
     current+=num
     list_of.append(current)
 print(list_of)

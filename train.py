@@ -15,7 +15,7 @@ from utils.args import ARGSer
 from models import get_model, convert_to_separable_conv
 from utils import set_bn_momentum
 from datasets import ext_transforms as et
-from datasets .custom import SegmentationDataset
+from datasets .dataset import SegmentationDataset
 from metrics import StreamSegMetrics
 
 
@@ -75,7 +75,7 @@ def main():
     # ==========   Train Loop   ==========#
     train_frame = None
     for epoch in range(ARGS.EPOCHS):
-        print('\033[32m', end='')
+        print('\033[32m', end='')  # 设置字体颜色
         print('[Epoch]%d/%d' % (epoch, ARGS.EPOCHS), end=' ')
         print('[Batch Size]%d/%d' %
               (ARGS.TRAIN_BATCH_SIZE, ARGS.VALID_BATCH_SIZE), end=' ')
@@ -111,7 +111,7 @@ def main():
         model.eval()
         epoch_num = 0
         epoch_loss = 0.
-        pbar = tqdm.tqdm(train_loader)
+        pbar = tqdm.tqdm(valid_loader)  # valid_loader
         metrics.reset()
         for images, labels in pbar:
             images: Tensor = images.to(ARGS.DEVICE)

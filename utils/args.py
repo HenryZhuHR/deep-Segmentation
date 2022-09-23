@@ -46,7 +46,7 @@ class ARGSer:
         parser = argparse.ArgumentParser()
         # ====== Dataset ======
         parser.add_argument('--data_root', type=str,
-                            default=os.path.expanduser('~/datasets/gc10_mask_mship'))
+                            default='D:/projects/partsegvis/partsegvis/dataset/gc10_mask_mship/')
         parser.add_argument('--num_classes', type=int, default=21)
         parser.add_argument('--size', type=int, default=299)
 
@@ -63,6 +63,7 @@ class ARGSer:
         parser.add_argument('--valid_batch_size', type=int, default=4)
         parser.add_argument('--num_workers', type=int, default=4)
         parser.add_argument('--epochs', type=int, default=30e3)
+        
         parser.add_argument('--lr', type=float, default=0.01)
         parser.add_argument('--lr_schedule', type=str, default='poly',
                             choices=['poly', 'step'])

@@ -18,7 +18,7 @@ from utils.args import ARGSer
 from models import get_model, convert_to_separable_conv
 from utils import set_bn_momentum
 from datasets import ext_transforms as et
-from datasets .custom import SegmentationDataset
+from datasets .dataset import SegmentationDataset
 from metrics import StreamSegMetrics
 
 
@@ -38,8 +38,8 @@ def main():
     ARGS = ARGSer()
     ARGS.MODEL = 'deeplabv3plus_resnet50'
     ARGS.NUM_CLASSES = 3
-    ARGS.MODEL_WEIGHT = 'checkpoints/deeplabv3plus_resnet50-360.pt'
-    ARGS.IMAGE_FILE = '/home/ubuntu/datasets/forProject/gc10_mask_mship/test/JPEGImages/cg_0407.jpg'
+    ARGS.MODEL_WEIGHT = 'checkpoints\deeplabv3plus_resnet50\deeplabv3plus_resnet50-49.pt'
+    ARGS.IMAGE_FILE = 'D:/projects/partsegvis/partsegvis/dataset/gc10_mask_mship/test/JPEGImages/cvn_0020.jpg'
 
     model = get_model(ARGS.MODEL, num_classes=ARGS.NUM_CLASSES,
                       pretrained_backbone=True)
@@ -79,9 +79,10 @@ def main():
     result=cv2.addWeighted(img_src,0.5,mask_np,0.5,0)
     print(img_src.shape)
     print(mask_np.shape)
-    cv2.imwrite('tmp/img-src.png',img_src)
-    cv2.imwrite('tmp/img-mask.png',mask_np)
-    cv2.imwrite('tmp/img-mask.png',result)
+    os.makedirs('tmp1',exist_ok=True)
+    cv2.imwrite('tmp1/img-src.png',img_src)
+    cv2.imwrite('tmp1/img-mask.png',mask_np)
+    cv2.imwrite('tmp1/img-res.png',result)
 
 
 if __name__ == '__main__':
